@@ -380,7 +380,7 @@ public static class CheckTools
         var sketches = facts.Sketches.ToDictionary(s => s.Handle!, s => s.Status, StringComparer.Ordinal);
         foreach (var feature in features)
         {
-            report.Append(new string(' ', feature.Depth * 2)).Append(CultureInfo.InvariantCulture, $"{feature.Handle} {feature.Name} [{feature.TypeName}]");
+            report.Append(' ', feature.Depth * 2).Append(CultureInfo.InvariantCulture, $"{feature.Handle} {feature.Name} [{feature.TypeName}]");
             if (sketches.TryGetValue(feature.Handle, out var status))
             {
                 report.Append(' ').Append(status);

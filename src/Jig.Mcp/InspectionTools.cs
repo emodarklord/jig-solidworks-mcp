@@ -26,7 +26,7 @@ public static class InspectionTools
                 var report = new StringBuilder($"{target.Title}: {features.Count} features\n");
                 foreach (var feature in features)
                 {
-                    report.Append(new string(' ', feature.Depth * 2))
+                    report.Append(' ', feature.Depth * 2)
                         .Append(CultureInfo.InvariantCulture, $"{feature.Handle} {feature.Name} [{feature.TypeName}]")
                         .Append(feature.Suppressed ? " suppressed" : "")
                         .Append(feature.Error is null ? "" : $" ERROR: {feature.Error}")
