@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/benchmark/">
+    <Project Path="benchmark/Jig.Benchmark/Jig.Benchmark.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Jig.Core/Jig.Core.csproj" />
+    <Project Path="src/Jig.Fakes/Jig.Fakes.csproj" />
+    <Project Path="src/Jig.Mcp/Jig.Mcp.csproj" />
+    <Project Path="src/Jig.Server/Jig.Server.csproj" />
+    <Project Path="src/Jig.SolidWorks/Jig.SolidWorks.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Jig.LiveTests/Jig.LiveTests.csproj" />
+    <Project Path="tests/Jig.Tests/Jig.Tests.csproj" />
+  </Folder>
+</Solution>

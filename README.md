@@ -1,17 +1,17 @@
-# Datum
+# Jig
 
 An MCP server that lets AI assistants (Claude, Codex, Cursor, local models) model parts in SOLIDWORKS through its COM API. You describe a part in plain English. The assistant sketches, extrudes, fillets and patterns it, checks the result in numbers and pictures, and exports it.
 
-<p align="center"><img src="docs/images/bushing-build.gif" alt="A flanged bushing built step by step through Datum: profile sketch, revolve, one hole, a circular pattern, then fillets" width="560"></p>
+<p align="center"><img src="docs/images/bushing-build.gif" alt="A flanged bushing built step by step through Jig: profile sketch, revolve, one hole, a circular pattern, then fillets" width="560"></p>
 
-Status: v0.2. Parts only. Assemblies and drawings come later.
+Status: v0.6. Parts, assemblies, drawings, sheet metal, weldments and motion studies. Jig was called Datum up to v0.5.1.
 
 ## What it does
 
-- **Works on the SOLIDWORKS you have.** One build covers SOLIDWORKS 2021 and later on every license, Student and Education included. `datum diagnose` reports what it found.
+- **Works on the SOLIDWORKS you have.** One build covers SOLIDWORKS 2021 and later on every license, Student and Education included. `jig diagnose` reports what it found.
 - **Keeps parts editable.** Sketches are fully defined by default, with dimensions from the sketch origin, so a person can change the part later in SOLIDWORKS.
 - **Reports every change.** Each write replies with the volume before and after, the body count and any rebuild errors. A feature that fails or changes nothing is rolled back.
-- **Can undo its own work.** Every change Datum makes is journaled, so the assistant can restore any earlier checkpoint.
+- **Can undo its own work.** Every change Jig makes is journaled, so the assistant can restore any earlier checkpoint.
 - **Lets the assistant see the part.** `view_capture` returns a PNG of a standard view, or a four-view sheet drawn at one scale. It can show hidden lines, cut the view open, or number faces and edges with their handles.
 - **Checks work instead of trusting a rebuild.** `model_measure` measures distances, angles and clearances, `requirements_check` compares a part with a written list and reports what is still unverified, and `model_flex` tries each dimension to find what breaks. Reports cover sizes, measured distances, material, sketch definition and flex results, and a list survives closing the part.
 - **Reads parts it didn't build.** `model_summary` lists a part's features, dimensions and problems, with the likely cause of each rebuild error, and `sketch_read` reads finished sketches.
@@ -25,7 +25,7 @@ Status: v0.2. Parts only. Assemblies and drawings come later.
   <img src="docs/images/bracket.png" alt="L bracket with a hole in each leg and rounded edges" width="32%">
 </p>
 
-All the images on this page were rendered by Datum's own `view_capture`, from parts it built through its tools.
+All the images on this page were rendered by Jig's own `view_capture`, from parts it built through its tools.
 
 ## Requirements
 
@@ -37,47 +37,47 @@ Tested on SOLIDWORKS 2026 SP4.1 Student and SOLIDWORKS 2026 SP0 Premium.
 
 ## Install
 
-1. Download `datum-0.5.1-win-x64.zip` from [Releases](https://github.com/emodarklord/datum-solidworks-mcp/releases) and unzip it somewhere permanent, for example `C:\Tools\datum`. The exe is self-contained, so you don't need to install .NET. It isn't code-signed, so Windows SmartScreen may warn the first time you run it.
-2. Add Datum to the AI apps on your PC:
+1. Download `jig-0.6.0-win-x64.zip` from [Releases](https://github.com/emodarklord/jig-solidworks-mcp/releases) and unzip it somewhere permanent, for example `C:\Tools\jig`. The exe is self-contained, so you don't need to install .NET. It isn't code-signed, so Windows SmartScreen may warn the first time you run it.
+2. Add Jig to the AI apps on your PC:
 
    ```
-   C:\Tools\datum\datum.exe install
+   C:\Tools\jig\jig.exe install
    ```
 
-   It finds Claude Code, Claude Desktop, Cursor, VS Code and Codex, adds a `datum` entry to each one's settings, and leaves every other server alone. Each file is backed up first, to `%LOCALAPPDATA%\Datum\backups`. Add `--dry-run` to see what it would change, `--client cursor,codex` to pick apps, or run `datum uninstall` to take it out again. Restart the apps afterwards.
-3. Start SOLIDWORKS, then check that Datum can reach it:
+   It finds Claude Code, Claude Desktop, Cursor, VS Code and Codex, adds a `jig` entry to each one's settings, and leaves every other server alone. Each file is backed up first, to `%LOCALAPPDATA%\Jig\backups`. Add `--dry-run` to see what it would change, `--client cursor,codex` to pick apps, or run `jig uninstall` to take it out again. Restart the apps afterwards.
+3. Start SOLIDWORKS, then check that Jig can reach it:
 
    ```
-   C:\Tools\datum\datum.exe diagnose
+   C:\Tools\jig\jig.exe diagnose
    ```
 
-   This prints the Datum version, the folder it may write to, and the SOLIDWORKS version, license and add-ins. Run `datum diagnose --launch` to start SOLIDWORKS if it isn't running.
+   This prints the Jig version, the folder it may write to, and the SOLIDWORKS version, license and add-ins. Run `jig diagnose --launch` to start SOLIDWORKS if it isn't running.
 
 Then ask for a part, for example: *"Make a 60 × 40 × 10 mm plate with a 6 mm hole 8 mm in from each corner, fillet the vertical edges 3 mm, and export it as plate.step."*
 
 ### Manual setup
 
-For a client `datum install` doesn't know, add a stdio server whose command is the full path to `datum.exe`. In Claude Code's `.mcp.json` format:
+For a client `jig install` doesn't know, add a stdio server whose command is the full path to `jig.exe`. In Claude Code's `.mcp.json` format:
 
 ```json
 {
   "mcpServers": {
-    "datum": { "command": "C:\Tools\datum\datum.exe", "args": [] }
+    "jig": { "command": "C:\Tools\jig\jig.exe", "args": [] }
   }
 }
 ```
 
-The Store version of Claude Desktop reads its settings from `%LOCALAPPDATA%\Packages\Claude_<id>\LocalCache\Roaming\Claude\claude_desktop_config.json`, not the `%APPDATA%\Claude` file its "Edit Config" button opens. `datum install` writes to the right one.
+The Store version of Claude Desktop reads its settings from `%LOCALAPPDATA%\Packages\Claude_<id>\LocalCache\Roaming\Claude\claude_desktop_config.json`, not the `%APPDATA%\Claude` file its "Edit Config" button opens. `jig install` writes to the right one.
 
-Options (for `datum` itself, and accepted by `datum install`):
+Options (for `jig` itself, and accepted by `jig install`):
 
 | Option | Effect |
 |---|---|
-| `--allow <folder>` | An extra folder Datum may write to. Repeat it for more folders. `DATUM_ALLOW` takes a `;`-separated list. The default is `Documents\Datum`. |
+| `--allow <folder>` | An extra folder Jig may write to. Repeat it for more folders. `JIG_ALLOW` takes a `;`-separated list. The default is `Documents\Jig`. |
 | `--all-tools` | List every tool up front, for clients that don't handle `tools/list_changed`. |
-| `--allow-invoke-writes` | Let `invoke` make calls that may change a model. Without it the gateway only reads. `DATUM_ALLOW_INVOKE_WRITES=1` does the same. |
-| `--read-only` | Offer only tools that can't change a model or file: reading, checks, captures, and opening or switching documents. Overrides the invoke and macro switches. `DATUM_READ_ONLY=1` does the same. |
-| `--allow-macros` | Let `run_macro` run SOLIDWORKS macros. Datum can't undo what a macro does. |
+| `--allow-invoke-writes` | Let `invoke` make calls that may change a model. Without it the gateway only reads. `JIG_ALLOW_INVOKE_WRITES=1` does the same. |
+| `--read-only` | Offer only tools that can't change a model or file: reading, checks, captures, and opening or switching documents. Overrides the invoke and macro switches. `JIG_READ_ONLY=1` does the same. |
+| `--allow-macros` | Let `run_macro` run SOLIDWORKS macros. Jig can't undo what a macro does. |
 
 ## Tools
 
@@ -114,7 +114,7 @@ These toolsets load on request (`toolset_enable`), and `find_tools` searches the
 
 Tools that the connected SOLIDWORKS can't run (because of its version, license or add-ins) are hidden. `find_tools` says why.
 
-Resources: `datum://events` and `datum://selection` update as you work in SOLIDWORKS, for clients that subscribe. `datum://recipes` lists the saved sessions (`*.intent.json` in the Datum folder) that `recipe_run` replays, and `datum://recipes/{name}` shows one's steps.
+Resources: `jig://events` and `jig://selection` update as you work in SOLIDWORKS, for clients that subscribe. `jig://recipes` lists the saved sessions (`*.intent.json` in the Jig folder) that `recipe_run` replays, and `jig://recipes/{name}` shows one's steps.
 
 Conventions:
 - Lengths are in mm and angles in degrees.
@@ -123,13 +123,13 @@ Conventions:
 
 ## Benchmark
 
-Three Claude models each built 30 parts through Datum alone, and all 30 passed for all three. A part passes on its volume, box and body count, measured from the saved file against answers worked out by hand. The parts are single solids with one clear answer, so this shows the tools work, not that any model is better.
+Three Claude models each built 30 parts through Jig alone, and all 30 passed for all three. A part passes on its volume, box and body count, measured from the saved file against answers worked out by hand. The parts are single solids with one clear answer, so this shows the tools work, not that any model is better.
 
 The same 30 tasks were then run through two other SOLIDWORKS MCP servers, one fresh Sonnet session per part:
 
 | Server | Passed | Median time per part | Median tokens per part |
 |---|---|---|---|
-| Datum 0.5.0 | 30/30 | 29 s | 356k |
+| Jig 0.5.0 | 30/30 | 29 s | 356k |
 | andrewbartels1/SolidworksMCP-python | 30/30 | 65 s | 631k |
 | chrisncm17/solidworks-mcp | 22/30 | 112 s | 1.15M |
 
@@ -155,17 +155,17 @@ Method, setup and caveats, including why chrisncm17's misses happened, are in [b
 | Assemblies: components, mates, interference, BOM, configurations, exploded views | Live on Student |
 | Drawings: views, sections, details, dimensions, tolerances, title blocks, BOMs, balloons, `drawing_check` | Live on Student |
 | `invoke` gateway | Live on Student: reads, `out` parameters, enums by name, and changing a fillet's radius through `GetDefinition` and `ModifyDefinition` |
-| `datum install` | Tested offline against every client's file format; run on a real PC with Claude Code, Claude Desktop (Store build) and Codex |
-| SOLIDWORKS 2021–2025 | Not tested yet. The API members Datum uses all exist in 2021; reports welcome |
+| `jig install` | Tested offline against every client's file format; run on a real PC with Claude Code, Claude Desktop (Store build) and Codex |
+| SOLIDWORKS 2021–2025 | Not tested yet. The API members Jig uses all exist in 2021; reports welcome |
 
 ## Safety
 
-- Datum writes only inside its allowed folders: `Documents\Datum` by default, plus any you add with `--allow`.
+- Jig writes only inside its allowed folders: `Documents\Jig` by default, plus any you add with `--allow`.
 - It changes only documents it created, or ones you release with `doc_allow_edit`. Releasing a document backs it up first.
-- It won't overwrite a file or discard unsaved changes unless the call asks to. A replaced file is backed up to `%LOCALAPPDATA%\Datum\backups`.
-- Checkpoints cover Datum's own changes only, not edits you make by hand. Restoring one discards the later ones, so there's no redo. A deleted feature can't be brought back, so restores stop there.
-- Some SOLIDWORKS settings are switched temporarily, such as the dimension input prompt and the background colour while capturing. They're journaled and restored, even after a crash, the next time Datum connects.
-- The `invoke` gateway only reads unless Datum is started with `--allow-invoke-writes`, and even then it writes only to documents Datum may edit. File, window, macro and option calls are refused in favour of the curated tools. Datum can't undo a gateway write, so checkpoints can't restore past one.
+- It won't overwrite a file or discard unsaved changes unless the call asks to. A replaced file is backed up to `%LOCALAPPDATA%\Jig\backups`.
+- Checkpoints cover Jig's own changes only, not edits you make by hand. Restoring one discards the later ones, so there's no redo. A deleted feature can't be brought back, so restores stop there.
+- Some SOLIDWORKS settings are switched temporarily, such as the dimension input prompt and the background colour while capturing. They're journaled and restored, even after a crash, the next time Jig connects.
+- The `invoke` gateway only reads unless Jig is started with `--allow-invoke-writes`, and even then it writes only to documents Jig may edit. File, window, macro and option calls are refused in favour of the curated tools. Jig can't undo a gateway write, so checkpoints can't restore past one.
 
 ## Limitations
 
@@ -187,22 +187,22 @@ Method, setup and caveats, including why chrisncm17's misses happened, are in [b
 You need the .NET 10 SDK and a local SOLIDWORKS install: the interop assemblies are read from `<SOLIDWORKS>\api\redist`.
 
 ```
-dotnet build datum.slnx
-dotnet test tests/Datum.Tests
+dotnet build jig.slnx
+dotnet test tests/Jig.Tests
 ```
 
 Set `SolidWorksApiDir` if your install is somewhere else:
 
 ```
-dotnet build datum.slnx -p:SolidWorksApiDir="D:\SOLIDWORKS\api\redist"
+dotnet build jig.slnx -p:SolidWorksApiDir="D:\SOLIDWORKS\api\redist"
 ```
 
-`tests/Datum.LiveTests` drives a running SOLIDWORKS and must be run on a machine that has it. CI builds and runs only the projects that don't need SOLIDWORKS.
+`tests/Jig.LiveTests` drives a running SOLIDWORKS and must be run on a machine that has it. CI builds and runs only the projects that don't need SOLIDWORKS.
 
 To build the release exe:
 
 ```
-dotnet publish src/Datum.Server -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o artifacts/datum
+dotnet publish src/Jig.Server -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o artifacts/jig
 ```
 
 ## Not affiliated

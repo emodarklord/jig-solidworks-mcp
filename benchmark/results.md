@@ -2,11 +2,11 @@
 
 30 single-part tasks in `tasks.json`, from a plain block to a V-pulley and a keyed shaft. Each has an expected volume and box worked out by hand.
 
-A part passes when the saved file has one body, its volume is within 0.5% and each box size is within 0.5 mm. `Datum.Benchmark score` measures that in SOLIDWORKS, so a result doesn't depend on what a session says it did.
+A part passes when the saved file has one body, its volume is within 0.5% and each box size is within 0.5 mm. `Jig.Benchmark score` measures that in SOLIDWORKS, so a result doesn't depend on what a session says it did.
 
 ## Run of 2026-11-07
 
-SOLIDWORKS 2026 SP4.1 Student, Claude Code subagents, Datum tools only.
+SOLIDWORKS 2026 SP4.1 Student, Claude Code subagents, Jig tools only.
 
 | Model | Passed | How it ran | Time | Tool calls | Tokens |
 |---|---|---|---|---|---|
@@ -22,16 +22,16 @@ SOLIDWORKS 2026 SP4.1 Student, Claude Code subagents, Datum tools only.
 - Tokens include Claude Code's own instructions and tool lists. That is why a one-feature block used about 59,000 tokens.
 - Sonnet first scored 29/30. The miss was an error in the answer key, not in the part: the keyway removes the top of the shaft, so the height is 29.46, not 30. The key was corrected and the same part then passed.
 - Sessions had to recover from real problems, which didn't count against them. Two bugs they hit are fixed: a through cut on the far side of a sketch, and a second rectangle on the same centre.
-- These runs used a Datum build from before those fixes.
+- These runs used a Jig build from before those fixes.
 - Other MCP servers are compared in the head-to-head below.
 
 ## Head-to-head, 2026-11-08
 
-The same 30 tasks were run through two other SOLIDWORKS MCP servers and through Datum v0.5.0, using the same harness and scoring. Each task got a fresh `claude -p` session on Sonnet, with only that server's tools allowed.
+The same 30 tasks were run through two other SOLIDWORKS MCP servers and through Jig v0.5.0, using the same harness and scoring. Each task got a fresh `claude -p` session on Sonnet, with only that server's tools allowed.
 
 | Server | Version | Passed | Median time | Median tool calls | Median tokens | Cost at API prices |
 |---|---|---|---|---|---|---|
-| Datum | 0.5.0 | 30/30 | 29 s | 9 | 356k | $3.54 |
+| Jig | 0.5.0 | 30/30 | 29 s | 9 | 356k | $3.54 |
 | [andrewbartels1/SolidworksMCP-python](https://github.com/andrewbartels1/SolidworksMCP-python) | commit `f329da9` | 30/30 | 65 s | 16 | 631k | $5.44 |
 | [chrisncm17/solidworks-mcp](https://github.com/chrisncm17/solidworks-mcp) | commit `408a182` | 22/30 | 112 s | 22 | 1.15M | $10.44 |
 
@@ -54,7 +54,7 @@ How to read this:
 ## Run it yourself
 
 ```bash
-dotnet run --project benchmark/Datum.Benchmark -c Release -- run benchmark/tasks.json <folder> <model> --claude <claude.exe> --datum <datum.exe>
+dotnet run --project benchmark/Jig.Benchmark -c Release -- run benchmark/tasks.json <folder> <model> --claude <claude.exe> --jig <jig.exe>
 ```
 
-`run` needs Claude Code to be logged in. `score` works on any folder of `<id>.SLDPRT` files, however they were made. `--mcp-config <file>` runs another server instead of Datum; add `--parts <folder>` and `--name-only` for a server that saves into a folder of its own. The `run` mode has been tried only as far as the login step, because the runs above used subagents.
+`run` needs Claude Code to be logged in. `score` works on any folder of `<id>.SLDPRT` files, however they were made. `--mcp-config <file>` runs another server instead of Jig; add `--parts <folder>` and `--name-only` for a server that saves into a folder of its own. The `run` mode has been tried only as far as the login step, because the runs above used subagents.
