@@ -103,7 +103,7 @@ public sealed class ApiToolsTests : IDisposable
         Assert.StartsWith("NOT_ALLOWED: CloseDoc isn't available through invoke. Hint: Use doc_close", Error(refused), StringComparison.Ordinal);
     }
 
-    private static JsonElement Json(string json) => JsonDocument.Parse(json).RootElement;
+    private static JsonElement Json(string json) => JsonElement.Parse(json);
 
     private async Task<string> Part()
     {
